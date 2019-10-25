@@ -1,0 +1,20 @@
+version: '2'
+services:
+  drts_schedule_time:
+    image: erlang-ffmpeg
+    container_name: drts_schedule_time
+    hostname: drts_schedule_time_${dockerhostname}
+    #working_dir: /var/drts_schedule_time
+    volumes:
+      #- /var/log/drts_schedule_time:/var/log/drts_schedule_time
+      #- ./drts_schedule_time:/var/drts_schedule_time
+      - /usr/share/zoneinfo/Asia/Taipei:/usr/share/zoneinfo/Asia/Taipei
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime/
+    command: ["/bin/sh", "-c", "while true; do echo hello world; sleep 1000; done"]
+    #command: ["./drts_schedule_time.sh"]
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "10"
