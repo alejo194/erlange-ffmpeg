@@ -1,0 +1,24 @@
+version: '2'
+services:
+  db_store:
+    build: ./db_store/dockerconf
+    image: db_store:v1
+    container_name: db_store
+    hostname: db_store_jtt-test
+    working_dir: /var/db_store
+    volumes:
+      - ./db_store:/var/db_store
+      - /usr/share/zoneinfo/Asia/Taipei:/usr/share/zoneinfo/Asia/Taipei
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime/
+      - /var/maxwin/conf/db_store/freetds.conf:/etc/freetds/freetds.conf
+    ports:
+      - 9500:9500
+    network_mode: maxwin-net
+    command: ["./dbstore.sh"]
+    #command: ["/bin/sh", "-c", "while true; do echo hello world; sleep 1; done"]
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "10"
