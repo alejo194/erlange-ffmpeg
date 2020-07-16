@@ -1,0 +1,73 @@
+version: '2'
+services:
+  alive:
+    image: erlang:18.3.4.4
+    container_name: alive
+    hostname: alive
+    working_dir: /var/ebmis
+    volumes:
+      - ./ebmis:/var/ebmis
+      - /usr/share/zoneinfo/Asia/Taipei:/usr/share/zoneinfo/Asia/Taipei
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime/
+    network_mode: weave
+    command: ["./alive.sh"]
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+  ebmis:
+    image: erlang:18.3.4.4
+    container_name: ebmis
+    hostname: ebmis
+    working_dir: /var/ebmis
+    links:
+      - alive:alive
+    extra_hosts:
+      - "alive:10.32.0.1"
+      - "egateway:10.40.0.0"
+    volumes:
+      - ./ebmis:/var/ebmis
+      - /usr/share/zoneinfo/Asia/Taipei:/usr/share/zoneinfo/Asia/Taipei
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime/
+      - /var/log/ebmis:/var/log/ebmis
+    network_mode: weave
+    command: ["./bmis.sh"]
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+  db_store:
+    image: cxhjet/erl_odbc:1
+    container_name: db_store
+    hostname: db_store
+    working_dir: /var/db_store
+    links:
+      - alive:alive
+    extra_hosts:
+      - "sqlserver:192.168.47.53"
+      - "alive:10.32.0.1"
+      - "egateway:10.40.0.0"
+    volumes:
+      - ./db_store:/var/db_store
+      - ./conf/odbc/freetds.conf:/etc/freetds/freetds.conf
+      - ./conf/odbc/odbcinst.ini:/etc/odbcinst.ini
+      - ./conf/odbc/odbc.ini:/etc/odbc.ini
+      - ./conf/odbc/odbc.ini:/usr/local/etc/odbc.ini
+      - ./conf/odbc/odbcinst.ini:/usr/local/etc/odbcinst.ini
+      - /usr/share/zoneinfo/Asia/Taipei:/usr/share/zoneinfo/Asia/Taipei
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime/
+    ports:
+      - 9500:9500
+    network_mode: weave
+    command: ["./dbstore.sh"]
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
