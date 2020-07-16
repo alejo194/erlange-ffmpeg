@@ -1,0 +1,28 @@
+version: '2'
+services:
+  egateway:
+    image: erlang:18.3.4.4
+    container_name: egateway
+    hostname: egateway
+    working_dir: /var/ettia_gateway_1.5
+    #links:
+      #- alive:alive
+    extra_hosts:
+      - "alive:10.32.0.1"
+      - "ebmis:10.32.0.3"
+      - "db_store:10.32.0.2"
+    volumes:
+      - ./ettia_gateway_1.5:/var/ettia_gateway_1.5
+      - /usr/share/zoneinfo/Asia/Taipei:/usr/share/zoneinfo/Asia/Taipei
+      - /usr/share/zoneinfo/Asia/Taipei:/etc/localtime/
+      - /var/log/ettia_gateway:/var/log/ettia_gateway
+    ports:
+      - 7777:7777/udp
+    network_mode: weave
+    command: ["./ettia_gateway.sh"]
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
