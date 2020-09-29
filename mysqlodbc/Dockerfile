@@ -2,7 +2,7 @@ FROM erlang:18-slim
 COPY . /tmp/odbc
 RUN set -xe \
         && apt-get update \
-        && apt-get install -y freetds-bin freetds-dev tdsodbc wget \
+        && apt-get install -y freetds-bin freetds-dev tdsodbc wget unixodbc unixodbc-dev \
         && cp -rp /tmp/odbc/* /etc \
         && ln -s /etc/odbc.ini /usr/local/etc/ \
         && ln -s /etc/odbcinst.ini /usr/local/etc/ \
